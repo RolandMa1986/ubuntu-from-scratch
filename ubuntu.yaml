@@ -1,0 +1,73 @@
+{{- $image := or .image "debian.tgz" -}}
+
+architecture: amd64
+
+actions:
+  - action: debootstrap
+    suite: "bionic"
+    components: [ main, restricted, universe, multiverse ]
+    mirror: http://mirrors.ustc.edu.cn/ubuntu/
+    variant: minbase
+
+  - action: apt
+    packages: 
+     - sudo 
+     - adduser
+     - systemd-sysv
+     - linux-image-generic
+     - grub-efi-amd64
+     - initramfs-tools
+     - openssh-server 
+
+  - action: overlay
+    description: Install U-Boot menu configuration
+    source: overlays/preconfig
+
+
+  # - action: apt
+  #   recommends: false
+  #   packages: 
+  #   - ubuntu-standard
+
+
+  - action: image-partition
+    imagename: system.img
+    imagesize: 3G
+    partitiontype: gpt
+    mountpoints:
+      - mountpoint: /
+        partition: rootfs
+      - mountpoint: /boot/efi
+        partition: boot
+        options: [ x-systemd.automount ]
+    partitions:
+      - name: boot
+        fs: vfat
+        start: 2048S
+        end: 526336S
+        flags: [ boot, esp ]
+      - name: rootfs
+        fs: ext4
+        start: 526337S
+        end: 100%
+
+  - action: filesystem-deploy
+    description: Deploying filesystem onto image
+    setup-fstab: true
+    setup-kernel-cmdline: true
+
+  - action: run
+    chroot: true
+    command: grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=ubuntu --recheck --no-nvram
+
+  - action: run
+    chroot: true
+    command: update-grub
+
+  - action: run
+    chroot: true
+    script: scripts/setup_user.sh
+
+  - action: run
+    chroot: true
+    script: scripts/clean_rootfs.sh
