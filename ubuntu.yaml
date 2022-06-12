@@ -19,7 +19,7 @@ actions:
      - network-manager
 
   - action: overlay
-    description: Install U-Boot menu configuration
+    description: 增加默认配置文件
     source: overlays/preconfig
 
 
@@ -59,7 +59,6 @@ actions:
       libpinyin-data,
       libpinyin13,
       libwayland-egl1-mesa,
-      # linux-signed-generic-hwe-18.04,
       login,
       mokutil,
       ncurses-base,
@@ -107,6 +106,7 @@ actions:
     chroot: true
     command: update-grub
 
+  # 默认中文语言
   - action: run
     chroot: true
     command: locale-gen zh_CN.UTF-8 && update-locale LANG=zh_CN.utf8

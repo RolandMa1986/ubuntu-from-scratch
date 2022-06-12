@@ -1,11 +1,17 @@
 cat <<EOF > /etc/NetworkManager/NetworkManager.conf
 [main]
-rc-manager=resolvconf
 plugins=ifupdown,keyfile
-dns=dnsmasq
 
 [ifupdown]
 managed=false
+
+EOF
+
+cat <<EOF > /etc/netplan/01-network-manager-all.yaml
+# Let NetworkManager manage all devices on this system
+network:
+  version: 2
+  renderer: NetworkManager
 EOF
 
 dpkg-reconfigure network-manager
