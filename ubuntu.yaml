@@ -1,5 +1,3 @@
-{{- $image := or .image "debian.tgz" -}}
-
 architecture: amd64
 
 actions:
@@ -17,17 +15,63 @@ actions:
      - linux-image-generic
      - grub-efi-amd64
      - initramfs-tools
-     - openssh-server 
+     - openssh-server
+     - network-manager
 
   - action: overlay
     description: Install U-Boot menu configuration
     source: overlays/preconfig
 
 
-  # - action: apt
-  #   recommends: false
-  #   packages: 
-  #   - ubuntu-standard
+  - action: apt
+    recommends: false
+    packages: [aptitude, dash,
+      diffutils,
+      efibootmgr,
+      findutils,
+      fonts-arphic-ukai,
+      fonts-arphic-uming,
+      fonts-indic,
+      gir1.2-geocodeglib-1.0,
+      grep,
+      # grub-efi-amd64-signed,
+      gzip,
+      hostname,
+      ibus-table-wubi,
+      init,
+      language-pack-en,
+      language-pack-en-base,
+      language-pack-gnome-en,
+      language-pack-gnome-en-base,
+      language-pack-gnome-zh-hans,
+      language-pack-gnome-zh-hans-base,
+      language-pack-zh-hans,
+      language-pack-zh-hans-base,
+      libdbusmenu-gtk4,
+      libegl1-mesa,
+      libfwup1,
+      libgail-common,
+      libgail18,
+      libgtk2.0-0,
+      libgtk2.0-bin,
+      libgtk2.0-common,
+      libllvm6.0,
+      libpinyin-data,
+      libpinyin13,
+      libwayland-egl1-mesa,
+      # linux-signed-generic-hwe-18.04,
+      login,
+      mokutil,
+      ncurses-base,
+      ncurses-bin,
+      openssh-server,
+      shim-signed,
+      ubuntu-desktop,
+      ubuntu-minimal,
+      ubuntu-standard,
+      gedit
+      # ubuntu-wallpapers
+    ]
 
 
   - action: image-partition
@@ -54,7 +98,6 @@ actions:
   - action: filesystem-deploy
     description: Deploying filesystem onto image
     setup-fstab: true
-    setup-kernel-cmdline: true
 
   - action: run
     chroot: true
@@ -66,8 +109,17 @@ actions:
 
   - action: run
     chroot: true
+    command: locale-gen zh_CN.UTF-8 && update-locale LANG=zh_CN.utf8
+
+  - action: run
+    chroot: true
     script: scripts/setup_user.sh
 
   - action: run
     chroot: true
+    script: scripts/setup_network.sh
+
+  - action: run
+    chroot: true
     script: scripts/clean_rootfs.sh
+

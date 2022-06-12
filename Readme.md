@@ -10,3 +10,6 @@ sudo mount /dev/mapper/loop7p2 loop7p2
 
 
 VBoxManage convertfromraw --format VDI  system.img system.vdi
+
+
+qemu-img convert -f raw -O qcow2 image.img image.qcow2
